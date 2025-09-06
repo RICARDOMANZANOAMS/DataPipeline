@@ -14,7 +14,7 @@ class dataSplitStrategy(splitStrategy):
     '''
     def splitDataset(self,df,testSize=0.2):
         train,test=train_test_split(df,test_size=testSize) 
-        return [train, test]
+        return [(train, test)]
     
 class kFoldStrategy(splitStrategy):
     '''
@@ -23,8 +23,7 @@ class kFoldStrategy(splitStrategy):
     '''
     def splitDataset(self,df,kFolds):
         kf = KFold(n_splits=kFolds)
-        arraySplits=kf.split(df)
-        return list(arraySplits)
+        return [(df.iloc[train_idx], df.iloc[test_idx]) for train_idx, test_idx in kf.split(df)]
     
 class leaveOneOutStrategy(splitStrategy):
     '''
@@ -34,8 +33,7 @@ class leaveOneOutStrategy(splitStrategy):
     '''
     def splitDataset(self, df):
         loo = LeaveOneOut()
-        # Returns list of (train_idx, test_idx) tuples
-        return list(loo.split(df))
+        return [(df.iloc[train_idx], df.iloc[test_idx]) for train_idx, test_idx in loo.split(df)]
     
 class factorySplit:
     @staticmethod
