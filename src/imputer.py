@@ -41,7 +41,7 @@ class medianImputer(imputerStrategy):
             raise TypeError(f"Feature '{featureName}' is not numeric, cannot impute with median.") #Raise error if feature not numeric
         return df
 
-class valueImputer(imputerStrategy):
+class valueNullImputer(imputerStrategy):
     '''
     Child class of imputerStrategy that replaces null values with a value pass to impute
     '''
@@ -52,6 +52,16 @@ class valueImputer(imputerStrategy):
         df[featureName] = df[featureName].fillna(replacementValue)
         return df
 
+class valueToNullImputer(imputerStrategy):
+    '''
+    Child class of imputerStrategy that replaces a value chosen by null
+    '''
+    def impute(self, df, featureName, replacementValue):
+        import numpy as np
+        featureCol = df[featureName]
+        df[featureName] = featureCol.replace(replacementValue, np.nan)
+        return df
+    
 class factoryImputer:
     '''
     Factory class to implement all the classes in a modular way
@@ -63,6 +73,18 @@ class factoryImputer:
         elif imputeMethod=="median":
             return medianImputer()
         elif imputeMethod=="value":
-            return valueImputer()
+            return valueNullImputer()
+        elif imputeMethod=="valueToNull":
+            return valueToNullImputer()
         else:
             return "No imputation method"
+# import pandas as pd
+# import numpy as np
+# path='./data/DDoS-ACK_Fragmentation.csv'
+# df=pd.read_csv(path)
+# featureName="Rate"
+# replacementValue=np.inf
+# objfactoryImputer=factoryImputer.selectImputeMethod("valueToNull")
+# df_new=objfactoryImputer.impute(df,featureName,replacementValue)
+
+
