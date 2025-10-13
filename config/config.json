@@ -1,0 +1,53 @@
+{
+  "reader": {
+    "enabled":true,
+    "pathInput": "C:/RICARDO/personal/DataPipeline/data/DDoS-ACK_Fragmentation.csv",
+    "type": "csv"
+  },
+  "preprocessing": [
+    
+    { "duplicates": { 
+      "enabled":true,
+      "dropDuplicates": true
+       }
+    },
+    {
+      "imputation": {
+        "enabled": true ,
+        "featureName": "Rate",
+        "lookUpValue": "inf",
+        "method": "valueToNull"
+      }
+    },
+    {
+      "imputation": {
+        "enabled": true ,
+        "featureName": "Rate",
+        "lookUpValue": "inf",
+        "method": "valueToNull"
+      }
+    }
+  ],
+  "training": {
+    "dataSplit": {
+      "enabled":true,
+      "crossValidation": "kfold",
+      "trainSetPercentage": 0.8,
+      "testSetPercentage": 0.1,
+      "validationSetPercentage": 0.1,
+      "numberFoldsTraining": 3
+    },
+    "algorithm": {
+      "enabled":true,
+      "name": "rf",
+      "params": {
+        "n_estimators": 4,
+        "random_state": 42
+      }
+    }
+  },
+  "testing": {
+    "enabled":true
+   
+  }
+}
