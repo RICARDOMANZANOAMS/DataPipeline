@@ -15,7 +15,18 @@ class jsonReader(readerStrategy):
     def readInput(self, path):
         df=pd.read_json(path)
         return df
-    
+
+class csvReaderFolder(readerStrategy):
+    def readInput(self,path):
+        import glob
+        pathcsv=path+"/*.csv"
+        paths=glob.glob(pathcsv)
+        dfs=[]
+        for path in paths:
+            dfs.append(pd.read_csv(path))
+        df=pd.concat(dfs)
+        return df
+
 class factoryReader:
     @staticmethod
     def selectInput(input):
