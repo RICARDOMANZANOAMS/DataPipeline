@@ -4,7 +4,7 @@
 
 This repository contains a general-purpose program designed to **train and test classification models**.  
 It can be easily extended to support **regression problems**.  
-The system is **modular and extensible**, following software design patterns such as **Strategy** and **Factory**.
+The system is **modular and extensible**, following software design patterns such as **Strategy**, **Factory**, and **singleton**.
 
 The **data pipeline** is capable of reading multiple input formats, such as **CSV** and **JSON**, and can be easily extended to handle additional formats.
 
@@ -20,7 +20,7 @@ The **Trainer class** was implemented to support different **algorithms and data
 - Leave-One-Out Cross-Validation (LOOCV)
 
 The program uses a **configuration file** that enables easy customization of experimental parameters.
-
+The program implements logging as singleton.
 ---
 
 ## Workflow Overview
