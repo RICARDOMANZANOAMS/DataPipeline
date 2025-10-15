@@ -1,41 +1,64 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-
+from logger import logger
 class readerStrategy(ABC):
+    def __init__(self):
+        self.logger=logger()
+
     @abstractmethod
     def readInput(self,path):
         pass
 
 class csvReader(readerStrategy):
     def readInput(self,path):
-        df=pd.read_csv(path)  
-        return df
+        try:
+            df=pd.read_csv(path)  
+            self.logger.info("Read csv file")
+            return df
+        except Exception as e:
+            self.logger.error("Error reading csv file")
+            return None
     
 class jsonReader(readerStrategy):
     def readInput(self, path):
-        df=pd.read_json(path)
-        return df
+        try:
+            df=pd.read_json(path)
+            self.logger.info("Read json file")
+            return df
+        except Exception as e: 
+            self.logger.error("Error reading json file")
+            return None
 
 class csvReaderFolder(readerStrategy):
     def readInput(self,path):
         import glob
-        pathcsv=path+"/*.csv"
-        paths=glob.glob(pathcsv)
-        dfs=[]
-        for path in paths:
-            dfs.append(pd.read_csv(path))
-        df=pd.concat(dfs)
-        return df
+        try:        
+            pathcsv=path+"/*.csv"
+            paths=glob.glob(pathcsv)
+            dfs=[]
+            for path in paths:
+                dfs.append(pd.read_csv(path))
+            df=pd.concat(dfs)
+            self.logger.info("Read directory with csv files")
+            return df
+        except Exception as e:
+            self.logger.error("Error reading directory with csv files")
+            return None
 
 class factoryReader:
     @staticmethod
     def selectInput(input):
-        if input=="csv":
-            return csvReader()
-        elif input=="json":
-            return jsonReader()
-        else:
-            return "error"
+        logger=logger()
+        try:
+            if input=="csv":
+                return csvReader()
+            elif input=="json":
+                return jsonReader()
+            else:
+                return "error"
+        except Exception as e:
+            logger.error("Error choosing input")            
+            return None
         
 # factoryObj=factoryReader.selectInput("csv")
 # path="C:/RICARDO/personal/DataPipeline/data/DDoS-ACK_Fragmentation.csv"
