@@ -21,6 +21,19 @@ class testInputReader(unittest.TestCase):
         pd.testing.assert_frame_equal(result, df)
         os.remove(tmp_path)
 
+    def testJsonReader(self):
+        from inputReader import jsonReader
+        import json
+        dict=[{'a':3,'b':4}]
+        df_expected = pd.DataFrame(dict)
+        with tempfile.NamedTemporaryFile(mode="w+",suffix=".json",delete=False) as tmp:
+            json.dump(dict,tmp)
+            tmp_path=tmp.name
+        json_reader=jsonReader()
+        result=json_reader.readInput(tmp_path)
+        pd.testing.assert_frame_equal(result, df_expected)
+        os.remove(tmp_path)    
+
     
 
 
