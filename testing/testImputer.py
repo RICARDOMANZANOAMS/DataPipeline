@@ -29,7 +29,14 @@ class testImputer(unittest.TestCase):
         value_null_imputer=valueNullImputer()
         df_result=value_null_imputer.impute(self.df,'a',1)
         pd.testing.assert_frame_equal(df_result,expected_df,check_dtype=False)
-        
+
+    def testValueToNullInputer(self):
+        from imputer import valueToNullImputer
+        expected_df=pd.DataFrame({'a':[np.nan,5,6,np.nan],'b':[3,4,5,6]})
+        value_to_null_imputer=valueToNullImputer()
+        df_result=value_to_null_imputer.impute(self.df,'a',4)
+        pd.testing.assert_frame_equal(df_result,expected_df,check_dtype=False)
+
         
 if __name__ == "__main__":
     unittest.main()
