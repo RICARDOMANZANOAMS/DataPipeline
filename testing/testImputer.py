@@ -22,6 +22,14 @@ class testImputer(unittest.TestCase):
         median_imputer=medianImputer()
         df_result=median_imputer.impute(self.df,'a')
         pd.testing.assert_frame_equal(df_result,expected_df,check_dtype=False)
+    
+    def testValueNullImputer(self):
+        from imputer import valueNullImputer
+        expected_df=pd.DataFrame({'a':[4,5,6,1],'b':[3,4,5,6]})
+        value_null_imputer=valueNullImputer()
+        df_result=value_null_imputer.impute(self.df,'a',1)
+        pd.testing.assert_frame_equal(df_result,expected_df,check_dtype=False)
+        
         
 if __name__ == "__main__":
     unittest.main()
