@@ -27,7 +27,16 @@ class testSplit(unittest.TestCase):
         # Each split should have train + test = total rows
         for train, test in result_array:
             self.assertEqual(len(train) + len(test), len(self.df))
-
+    
+    def test_leave_one_out_strategy(self):
+        from split import leaveOneOutStrategy
+        loo_strategy = leaveOneOutStrategy()
+        result_array = loo_strategy.splitDataset(self.df)
+        self.assertEqual(len(result_array), len(self.df))
+        # Each split should have 1 test sample and the rest as train
+        for train, test in result_array:
+            self.assertEqual(len(test), 1)
+            self.assertEqual(len(train), len(self.df) - 1)
    
    
 if __name__ == "__main__":
