@@ -17,6 +17,18 @@ class testSplit(unittest.TestCase):
         expected_test_len = 3
         self.assertEqual(len(train_result), expected_train_len)
         self.assertEqual(len(test_result), expected_test_len)
+
+    def test_kfold_strategy(self):
+        from split import kFoldStrategy
+        kfold_strategy = kFoldStrategy()
+        kFolds = 5
+        result_array = kfold_strategy.splitDataset(self.df, kFolds)
+        self.assertEqual(len(result_array), kFolds)
+        # Each split should have train + test = total rows
+        for train, test in result_array:
+            self.assertEqual(len(train) + len(test), len(self.df))
+
+   
    
 if __name__ == "__main__":
     unittest.main()
