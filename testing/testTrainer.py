@@ -21,6 +21,34 @@ class testTrainer(unittest.TestCase):
         trainer_obj.train(train_df)
         self.assertTrue(hasattr(trainer_obj.model, "n_classes_"))
 
+    def test_test(self):
+        from trainer import trainer
+        import numpy as np
+        np.random.seed(32)
+        X = np.random.randn(100, 2)
+        y = (X[:, 0] + X[:, 1] > 0).astype(int)  # linearly separable
+
+        df = pd.DataFrame(X, columns=["f1", "f2"])
+        df["label"] = y
+
+        featuresName = ["f1", "f2"]
+        labelName = "label"
+        model = RandomForestClassifier(random_state=32, n_estimators=50)
+
+        trainer_obj = trainer(df, featuresName, labelName)
+        trainer_obj.model = model
+
+        
+        train_df = df.iloc[:80]
+        test_df = df.iloc[80:]
+
+        trainer_obj.train(train_df)
+        f1_score_result = trainer_obj.test(test_df)
+
+       
+        self.assertIsInstance(f1_score_result, float)
+        self.assertGreaterEqual(f1_score_result, 0.8)
+        self.assertLessEqual(f1_score_result, 1.0)
 
 
 
