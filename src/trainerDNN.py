@@ -28,6 +28,30 @@ class trainerDNN(trainer):
         dataloader_dataset=DataLoader(tensor_dataset,batch_size=batch_size,shuffle=True)
         return dataloader_dataset
     
+    def train(self, dataloader, model, num_epochs=10, lr=0.001):
+        import torch
+        import torch.nn as nn
+        import torch.optim as optim
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.Adam(model.parameters(), lr=lr)
+
+        model.train()
+        for epoch in range(num_epochs):
+            total_loss = 0
+            for features, label in dataloader:
+                features, label = features.to(device).float(), label.to(device).long()
+
+                optimizer.zero_grad()
+                outputs = model(features)
+                loss = criterion(outputs, label)
+                loss.backward()
+                optimizer.step()
+
+                total_loss += loss.item()
+        self.model=model
+           
 
     
 import numpy as np
