@@ -17,7 +17,7 @@ class trainerDNN(trainer):
             train_tensor=self.create_dataloader(train)
             test_tensor=self.create_dataloader(test)
             split_tensors.append((train_tensor,test_tensor))
-        self.splitArray=split_tensors
+        return split_tensors
             
     def create_dataloader(self,df,batch_size=32,shuffle=True):
         import torch
@@ -51,6 +51,8 @@ class trainerDNN(trainer):
 
                 total_loss += loss.item()
         self.model=model
+
+    
            
 
     
@@ -69,3 +71,5 @@ print(dataset)
 trainer_dnn=trainerDNN(dataset,feature_names,'label')
 dataloader=trainer_dnn.create_dataloader(dataset)
 print(dataloader)
+train_test=trainer_dnn.split("split",{"test_size":0.2})
+print(train_test)
