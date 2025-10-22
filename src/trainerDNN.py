@@ -51,7 +51,7 @@ class trainerDNN(trainer):
 
                 total_loss += loss.item()
         self.model=model
-        
+
     def test(self,dataloader,model):
         import torch
         import torch.nn as nn
@@ -90,3 +90,23 @@ dataloader=trainer_dnn.create_dataloader(dataset)
 print(dataloader)
 train_test=trainer_dnn.split("split",{"test_size":0.2})
 print(train_test)
+
+
+import torch.nn as nn
+import torch
+class NeuralNetwork(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(NeuralNetwork, self).__init__()
+        self.hidden = nn.Linear(input_dim, hidden_dim)
+        self.output = nn.Linear(hidden_dim, output_dim)
+    
+    def forward(self, x):
+        x = torch.relu(self.hidden(x))  # Apply ReLU activation correctly
+        x = self.output(x)
+        return x
+network=NeuralNetwork(4,8,2)
+
+trainer_dnn.train(train_test[0][0],network)
+preds, labels = trainer_dnn.test(train_test[0][1], network)
+print("Predicted:", preds)
+print("True:", labels)
