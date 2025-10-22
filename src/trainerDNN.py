@@ -51,6 +51,23 @@ class trainerDNN(trainer):
 
                 total_loss += loss.item()
         self.model=model
+        
+    def test(self,dataloader,model):
+        import torch
+        import torch.nn as nn
+        predicted_all=[]
+        true_labels_all=[]
+        with torch.no_grad():
+            for features, labels in dataloader:                
+                outputs=model(features)
+                probs=nn.functional.softmax(outputs,dim=1)
+                _,labels_predicted=torch.max(probs,1)
+                               
+                predicted_all.extend(labels_predicted.cpu().numpy())
+                true_labels_all.append(labels.cpu().numpy())
+
+        return np.array(predicted_all), np.array(true_labels_all)
+
 
     
            
