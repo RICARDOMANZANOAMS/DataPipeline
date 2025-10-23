@@ -55,10 +55,12 @@ class trainerDNN(trainer):
     def test(self,dataloader,model):
         import torch
         import torch.nn as nn
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         predicted_all=[]
         true_labels_all=[]
         with torch.no_grad():
-            for features, labels in dataloader:                
+            for features, labels in dataloader:    
+                features,labels=features.to(device).float(), labels.to(device).long()      
                 outputs=model(features)
                 probs=nn.functional.softmax(outputs,dim=1)
                 _,labels_predicted=torch.max(probs,1)
