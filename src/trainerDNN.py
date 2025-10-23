@@ -60,7 +60,8 @@ class trainerDNN(trainer):
         true_labels_all=[]
         with torch.no_grad():
             for features, labels in dataloader:    
-                features,labels=features.to(device).float(), labels.to(device).long()      
+                features,labels=features.to(device).float(), labels.to(device).long()
+                      
                 outputs=model(features)
                 probs=nn.functional.softmax(outputs,dim=1)
                 _,labels_predicted=torch.max(probs,1)
