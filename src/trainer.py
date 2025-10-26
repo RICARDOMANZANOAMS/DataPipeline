@@ -1,4 +1,5 @@
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+import numpy as np
 class trainer:
     '''
     This class is the general class to train a classification or regression problem
@@ -41,12 +42,8 @@ class trainer:
         This method implements the testing of the model and calculates confusion matrix, classification report,
         and accuracy 
         '''
+        from sklearn.metrics import f1_score
         predicted=self.model.predict(testDataset[self.featureNames])
         groundTruth=testDataset[self.labelName]
-        acc=accuracy_score(predicted,groundTruth)
-        cm=confusion_matrix(predicted,groundTruth)
-        cr=classification_report(predicted,groundTruth)
-        print(acc)
-        print(cm)
-        print(cr)
+        return np.array(predicted), np.array(groundTruth)
 
