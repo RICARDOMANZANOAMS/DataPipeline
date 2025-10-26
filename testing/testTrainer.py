@@ -43,12 +43,17 @@ class testTrainer(unittest.TestCase):
         test_df = df.iloc[80:]
 
         trainer_obj.train(train_df)
-        f1_score_result = trainer_obj.test(test_df)
+        predicted, ground_truth = trainer_obj.test(test_df)
 
-       
-        self.assertIsInstance(f1_score_result, float)
-        self.assertGreaterEqual(f1_score_result, 0.8)
-        self.assertLessEqual(f1_score_result, 1.0)
+        self.assertIsInstance(predicted, np.ndarray)
+        self.assertIsInstance(ground_truth, np.ndarray)
+        self.assertEqual(predicted.shape, ground_truth.shape)
+
+        from sklearn.metrics import accuracy_score
+        acc=accuracy_score(pd.DataFrame(predicted),pd.DataFrame(ground_truth))       
+        self.assertIsInstance(acc, float)
+        self.assertGreaterEqual(acc, 0.8)
+        self.assertLessEqual(acc, 1.0)
 
 
 
