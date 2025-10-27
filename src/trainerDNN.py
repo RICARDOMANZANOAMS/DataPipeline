@@ -1,4 +1,5 @@
 from trainer import trainer
+import numpy as np
 class trainerDNN(trainer):
     def __init__(self,df,featureNames,labelName):
         super().__init__(df,featureNames,labelName)
@@ -19,11 +20,11 @@ class trainerDNN(trainer):
             split_tensors.append((train_tensor,test_tensor))
         return split_tensors
             
-    def create_dataloader(self,batch_size=32,shuffle=True):
+    def create_dataloader(self,df,batch_size=32,shuffle=True):
         import torch
         from torch.utils.data import TensorDataset, DataLoader
-        features=torch.tensor(self.df[self.featureNames].to_numpy())
-        label=torch.tensor(self.df[self.labelName].to_numpy())
+        features=torch.tensor(df[self.featureNames].to_numpy())
+        label=torch.tensor(df[self.labelName].to_numpy())
         tensor_dataset=TensorDataset(features,label)
         dataloader_dataset=DataLoader(tensor_dataset,batch_size=batch_size,shuffle=True)
         return dataloader_dataset
@@ -76,40 +77,40 @@ class trainerDNN(trainer):
            
 
     
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 
-x=np.random.rand(30,4)
-y=np.random.choice([1,0],size=30)    
-feature_names=['f1','f2','f3','f4']
-X=pd.DataFrame(x,columns=feature_names)
-y=pd.DataFrame(y,columns=['label'])
-print(X)
-print(y)
-dataset=pd.concat([X,y],axis=1)
-print(dataset)
-trainer_dnn=trainerDNN(dataset,feature_names,'label')
-dataloader=trainer_dnn.create_dataloader(dataset)
-print(dataloader)
-train_test=trainer_dnn.split("split",{"test_size":0.2})
-print(train_test)
+# x=np.random.rand(30,4)
+# y=np.random.choice([1,0],size=30)    
+# feature_names=['f1','f2','f3','f4']
+# X=pd.DataFrame(x,columns=feature_names)
+# y=pd.DataFrame(y,columns=['label'])
+# print(X)
+# print(y)
+# dataset=pd.concat([X,y],axis=1)
+# print(dataset)
+# trainer_dnn=trainerDNN(dataset,feature_names,'label')
+# dataloader=trainer_dnn.create_dataloader(dataset)
+# print(dataloader)
+# train_test=trainer_dnn.split("split",{"test_size":0.2})
+# print(train_test)
 
 
-import torch.nn as nn
-import torch
-class NeuralNetwork(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
-        super(NeuralNetwork, self).__init__()
-        self.hidden = nn.Linear(input_dim, hidden_dim)
-        self.output = nn.Linear(hidden_dim, output_dim)
+# import torch.nn as nn
+# import torch
+# class NeuralNetwork(nn.Module):
+#     def __init__(self, input_dim, hidden_dim, output_dim):
+#         super(NeuralNetwork, self).__init__()
+#         self.hidden = nn.Linear(input_dim, hidden_dim)
+#         self.output = nn.Linear(hidden_dim, output_dim)
     
-    def forward(self, x):
-        x = torch.relu(self.hidden(x))  # Apply ReLU activation correctly
-        x = self.output(x)
-        return x
-network=NeuralNetwork(4,8,2)
+#     def forward(self, x):
+#         x = torch.relu(self.hidden(x))  # Apply ReLU activation correctly
+#         x = self.output(x)
+#         return x
+# network=NeuralNetwork(4,8,2)
 
-trainer_dnn.train(train_test[0][0],network)
-preds, labels = trainer_dnn.test(train_test[0][1], network)
-print("Predicted:", preds)
-print("True:", labels)
+# trainer_dnn.train(train_test[0][0],network)
+# preds, labels = trainer_dnn.test(train_test[0][1], network)
+# print("Predicted:", preds)
+# print("True:", labels)
