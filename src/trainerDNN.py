@@ -19,11 +19,11 @@ class trainerDNN(trainer):
             split_tensors.append((train_tensor,test_tensor))
         return split_tensors
             
-    def create_dataloader(self,df,batch_size=32,shuffle=True):
+    def create_dataloader(self,batch_size=32,shuffle=True):
         import torch
         from torch.utils.data import TensorDataset, DataLoader
-        features=torch.tensor(df[self.featureNames].to_numpy())
-        label=torch.tensor(df[self.labelName].to_numpy())
+        features=torch.tensor(self.df[self.featureNames].to_numpy())
+        label=torch.tensor(self.df[self.labelName].to_numpy())
         tensor_dataset=TensorDataset(features,label)
         dataloader_dataset=DataLoader(tensor_dataset,batch_size=batch_size,shuffle=True)
         return dataloader_dataset
