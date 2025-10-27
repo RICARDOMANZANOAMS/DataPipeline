@@ -2,6 +2,12 @@ import unittest
 import torch.nn as nn
 import numpy as np
 import pandas as pd
+import torch
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+from trainerDNN import trainerDNN
+from torch.utils.data import DataLoader
 class TestTrainerDNN(unittest.TestCase):
     
     def setUp(self):
@@ -18,7 +24,11 @@ class TestTrainerDNN(unittest.TestCase):
             nn.Linear(10,2)
         )
         print(self.neural_network)
-        
+        self.trainer_DNN=trainerDNN(self.dataset,self.feature_names,self.label_name)
+
+    def test_create_dataloader(self):         
+        dataloader= self.trainer_DNN.create_dataloader(batch_size=16, shuffle=True)
+        self.assertIsInstance(dataloader,DataLoader)
         
 
 if __name__ == "__main__":
