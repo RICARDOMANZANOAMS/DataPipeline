@@ -34,6 +34,12 @@ class TestTrainerDNN(unittest.TestCase):
         loaded_samples = sum(batch[0].shape[0] for batch in dataloader)
         self.assertEqual(total_samples, loaded_samples)
 
+    def test_split_split(self):
+        split_tensors=self.trainer_DNN.split("split",{"test_size":0.2})
+        self.assertIsInstance(split_tensors[0][0],DataLoader)
+        self.assertIsInstance(split_tensors[0][1],DataLoader)
+
+
 
 if __name__ == "__main__":   
     unittest.main()
