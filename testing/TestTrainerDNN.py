@@ -23,14 +23,17 @@ class TestTrainerDNN(unittest.TestCase):
             nn.ReLU(),
             nn.Linear(10,2)
         )
-        print(self.neural_network)
+        
         self.trainer_DNN=trainerDNN(self.dataset,self.feature_names,self.label_name)
 
     def test_create_dataloader(self):         
-        dataloader= self.trainer_DNN.create_dataloader(batch_size=16, shuffle=True)
+        dataloader= self.trainer_DNN.create_dataloader(self.dataset,batch_size=16, shuffle=True)
         self.assertIsInstance(dataloader,DataLoader)
-        
 
-if __name__ == "__main__":
-   
-    unittest.main(buffer=False)
+        total_samples = len(self.dataset)
+        loaded_samples = sum(batch[0].shape[0] for batch in dataloader)
+        self.assertEqual(total_samples, loaded_samples)
+
+
+if __name__ == "__main__":   
+    unittest.main()
