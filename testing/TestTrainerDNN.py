@@ -38,7 +38,15 @@ class TestTrainerDNN(unittest.TestCase):
         split_tensors=self.trainer_DNN.split("split",{"test_size":0.2})
         self.assertIsInstance(split_tensors[0][0],DataLoader)
         self.assertIsInstance(split_tensors[0][1],DataLoader)
+        length_dataset=len(self.dataset)
+        length_train=length_dataset*0.8
+        length_test=length_dataset-length_train
+        length_train_dataloader = sum(batch[0].shape[0] for batch in split_tensors[0][0])
+        length_test_dataloader = sum(batch[0].shape[0] for batch in split_tensors[0][1])
+        self.assertEqual(length_train, length_train_dataloader)
+        self.assertEqual(length_test, length_test_dataloader)
 
+    
 
 
 if __name__ == "__main__":   
