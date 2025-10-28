@@ -11,8 +11,8 @@ from torch.utils.data import DataLoader
 class TestTrainerDNN(unittest.TestCase):
     
     def setUp(self):
-        X=np.random.rand(100,3)
-        y=np.random.choice([1,0],size=100)
+        X=np.random.rand(120,3)
+        y=np.random.choice([1,0],size=120)
         self.feature_names=["f1","f2","f3"]
         self.label_name="label"
         X_pd=pd.DataFrame(X,columns=self.feature_names)
@@ -46,7 +46,41 @@ class TestTrainerDNN(unittest.TestCase):
         self.assertEqual(length_train, length_train_dataloader)
         self.assertEqual(length_test, length_test_dataloader)
 
-    
+        
+    def test_split_kfold(self):
+        import math
+        kFolds=3
+        length_dataset=len(self.dataset)
+        number_datasamples_test=math.ceil(length_dataset/3)
+        number_datasamples_train=length_dataset-number_datasamples_test
+        split_tensors=self.trainer_DNN.split("kFold",{"kFolds":kFolds})
+        lenght_splits=3
+        #Kfold 1
+        self.assertEqual(lenght_splits, kFolds)  
+        self.assertIsInstance(split_tensors[0][0],DataLoader)
+        self.assertIsInstance(split_tensors[0][1],DataLoader)
+        length_train_dataloader1 = sum(batch[0].shape[0] for batch in split_tensors[0][0])
+        length_test_dataloader1 = sum(batch[0].shape[0] for batch in split_tensors[0][1])
+        self.assertEqual(number_datasamples_train, length_train_dataloader1)
+        self.assertEqual(number_datasamples_test, length_test_dataloader1)        
+        #kfold 2
+        self.assertIsInstance(split_tensors[1][0],DataLoader)
+        self.assertIsInstance(split_tensors[1][1],DataLoader)
+        length_train_dataloader2 = sum(batch[0].shape[0] for batch in split_tensors[1][0])
+        length_test_dataloader2 = sum(batch[0].shape[0] for batch in split_tensors[1][1])
+        self.assertEqual(number_datasamples_train, length_train_dataloader2)
+        self.assertEqual(number_datasamples_test, length_test_dataloader2)
+        #kfold 3
+        self.assertIsInstance(split_tensors[2][0],DataLoader)
+        self.assertIsInstance(split_tensors[2][1],DataLoader)
+        length_train_dataloader3 = sum(batch[0].shape[0] for batch in split_tensors[2][0])
+        length_test_dataloader3 = sum(batch[0].shape[0] for batch in split_tensors[2][1])
+        self.assertEqual(number_datasamples_train, length_train_dataloader3)
+        self.assertEqual(number_datasamples_test, length_test_dataloader3)
+        
+        
+        
+
 
 
 if __name__ == "__main__":   
