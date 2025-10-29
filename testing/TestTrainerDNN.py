@@ -5,6 +5,7 @@ import pandas as pd
 import torch
 import os
 import sys
+import copy
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 from trainerDNN import trainerDNN
 from torch.utils.data import DataLoader
@@ -91,7 +92,24 @@ class TestTrainerDNN(unittest.TestCase):
         length_test_dataloader1 = sum(batch[0].shape[0] for batch in split_tensors[0][1])
         self.assertEqual( length_dataset-1, length_train_dataloader1)
         self.assertEqual(1, length_test_dataloader1)   
+    
+    def test_train(self):
+        def models_are_equal(model_a, model_b, device="cpu"):
+            for p1, p2 in zip(model_a.parameters(), model_b.parameters()):
+                if not torch.equal(p1.to(device), p2.to(device)):
+                    return False
+            return True
 
+        initial_model = copy.deepcopy(self.neural_network)
+        modified_model=copy.deepcopy(self.neural_network)
+        split_tensors=self.trainer_DNN.split("split",{"test_size":0.2})
+        train=split_tensors[0][0]
+        test=split_tensors[0][1]
+        model_after_training=self.trainer_DNN.train_dnn(train,self.neural_network,10,0.001)
+        self.assertFalse(
+            models_are_equal(initial_model, model_after_training),
+            "Model parameters (weights/biases) did not change after training"
+        )
  
 
 if __name__ == "__main__":   
