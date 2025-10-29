@@ -82,13 +82,17 @@ class TestTrainerDNN(unittest.TestCase):
         import math
         length_dataset=len(self.dataset)
         split_tensors=self.trainer_DNN.split("LOOCV",{})
+        lenght_splits=len(split_tensors)
+        self.assertEqual(120,  lenght_splits)
+
         self.assertIsInstance(split_tensors[0][0],DataLoader)
         self.assertIsInstance(split_tensors[0][1],DataLoader)
         length_train_dataloader1 = sum(batch[0].shape[0] for batch in split_tensors[0][0])
         length_test_dataloader1 = sum(batch[0].shape[0] for batch in split_tensors[0][1])
         self.assertEqual( length_dataset-1, length_train_dataloader1)
         self.assertEqual(1, length_test_dataloader1)   
-        
+
+ 
 
 if __name__ == "__main__":   
     unittest.main()
