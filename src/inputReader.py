@@ -45,6 +45,17 @@ class csvReaderFolder(readerStrategy):
             self.logger.error("Error reading directory with csv files")
             return None
 
+class jpgReader(readerStrategy):
+    
+    def readInput(self,path):
+        from PIL import Image
+        import numpy as np
+        img = Image.open(path)  
+        img_gray = img.convert('L')         
+        img_np = np.array(img_gray)        
+        df = pd.DataFrame(img_np )
+        return df
+
 class factoryReader:
     @staticmethod
     def selectInput(input):
