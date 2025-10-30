@@ -56,6 +56,15 @@ class jpgReader(readerStrategy):
         df = pd.DataFrame(img_np )
         return df
 
+
+class shpReader(readerStrategy):    
+    def readInput(self, path):
+        import geopandas as gpd
+        gdf = gpd.read_file(path)
+        return gdf
+        
+        
+
 class factoryReader:
     @staticmethod
     def selectInput(input):
