@@ -63,6 +63,18 @@ class shpReader(readerStrategy):
         gdf = gpd.read_file(path)
         return gdf
         
+
+class lasReader(readerStrategy):
+    def readInput(self, path):
+        import laspy
+        las = laspy.read(path)
+        data = {"x": las.x, "y": las.y, "z": las.z}
+        attrs = ["intensity", "classification", "return_number", 
+                 "number_of_returns", "scan_angle", "user_data"]
+        for attr in attrs:
+            if hasattr(las, attr):
+                data[attr] = getattr(las, attr)
+        return pd.DataFrame(data)
         
 
 class factoryReader:
@@ -79,6 +91,8 @@ class factoryReader:
         except Exception as e:
             logger.error("Error choosing input")            
             return None
+        
+    
         
 # factoryObj=factoryReader.selectInput("csv")
 # path="C:/RICARDO/personal/DataPipeline/data/DDoS-ACK_Fragmentation.csv"
