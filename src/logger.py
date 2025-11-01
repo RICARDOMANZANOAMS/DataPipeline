@@ -1,28 +1,50 @@
 import os
 import logging
 import sys
-class logger:
-    _instance=None
-    def __new__(cls):
-        if cls._instance==None:
-            cls._instance=super(logger,cls).__new__(cls)
-            handler=logging.StreamHandler(sys.stdout)
-            format_log=logging.Formatter("%(asctime)s [%(levelname)s] %(message)s","%Y-%m-%d %H:%M:%S")
-            handler.setFormatter(format_log)
+class Logger:
+    def __init__(self,name_logger):
+        self.name_logger=name_logger
+        self.logger=logging.getLogger(self.name_logger)
 
-            cls._instance.logger=logging.getLogger("AppLogger")
-            cls._instance.logger.setLevel(logging.INFO)
-            cls._instance.logger.addHandler(handler)
-            cls._instance.logger.propagate=False
-               
-        return cls._instance
+
+    def create_handler_with_level_and_format(self,level_logging,formatter_string,handler_type,**param_handler):
+        '''
+        This method adds handlers to the logger.
+        Handlers are the outputs that a logger can have. For example, it can log to a file or to the console.
+        Args:
+            level_logging (str): 'debug', 'info', or 'error'
+            formatter_string (str): The string format for the logs.
+            handler_type (str): 'stream' or 'file'
+            **param_handler: Extra parameters (like filename for FileHandler)
+        '''
+        handler_obj=FactoryHandler.select_handler(handler_type,**param_handler)
+        formatter=logging.Formatter(formatter_string)
+        level=FactoryLevel.select_level(level_logging)
+        handler_obj.setLevel(level)
+        handler_obj.setFormatter(formatter)
+        self.logger.addHandler(handler_obj)
+        return self.logger
     
-    def info(self,message):
-        self.logger.info(message)
+class FactoryHandler:
+        @staticmethod
+        def select_handler(handler_type,**param):
+            if handler_type=="stream":
+                return logging.StreamHandler()
+            if handler_type=="file":
+                 return logging.FileHandler(**param)
+            else:
+                 raise ValueError(f"Unknown handler type: {handler_type}")
 
-    def error(self,message):
-        self.logger.error(message)
+class FactoryLevel:
+     @staticmethod
+     def select_level(level_type):
+        if level_type=="debug":
+            return logging.DEBUG
+        if level_type=="info":
+            return logging.INFO
+        if level_type=="error":
+            return logging.ERROR
+        else:
+            raise ValueError(f"Unknown level type: {level_type}")
 
-
-
-    
+          
