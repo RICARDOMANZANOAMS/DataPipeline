@@ -25,6 +25,33 @@ class Logger:
         self.logger.addHandler(handler_obj)
         return self.logger
     
+    @staticmethod
+    def log_exceptions(get_logger):
+        '''Decorator that logs exceptions using a dynamic logger from self or fixed logger.
+            This decorator was created to not put try and except wrapping each function.
+            In addition, it is dynamic since it takes a logger to log it which does flexible
+            Args: 
+                get_logger (Logger instance): Logger instance to use to log exceptions
+        '''
+        def decorator(func):
+            '''
+            Args:
+                func: Original function to be wrapped by the code
+            '''
+            def wrapper(*args, **kwargs):
+                # Support callable or direct logger
+                logger = get_logger(args[0]) if callable(get_logger) else get_logger
+                try:
+                    return func(*args, **kwargs)
+                except Exception:
+                    if logger:
+                        #Logger error to log only the function where the error occurs. 
+                        #It does not log the entire traceback. The entire traceback will be log in the upper layer of the flask
+                        logger.error(f"Exception in {func.__name__}")
+                    raise  # bubble up to Flask or outer layers
+            return wrapper
+        return decorator
+    
 class FactoryHandler:
         @staticmethod
         def select_handler(handler_type,**param):
@@ -47,4 +74,28 @@ class FactoryLevel:
         else:
             raise ValueError(f"Unknown level type: {level_type}")
 
-          
+class Operations:
+    def __init__(self,logger):
+        self.logger=logger
+
+    @Logger.log_exceptions(lambda self: self.logger)
+    def test_div (self,number):
+        return number/0        
+
+
+
+if __name__ == '__main__':
+    try:
+        logger=Logger("app")
+        logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
+        log = logger.logger
+        log.setLevel(logging.DEBUG)
+        log.info("test")
+        log.error("test 1")
+        log.info("test 1")
+        operations=Operations(log)
+        operations.test_div(4)
+    except Exception as e:
+        log.exception("this is the final error")
+
+
