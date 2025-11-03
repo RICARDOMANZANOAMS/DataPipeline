@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-from logger import logger
 class imputerStrategy(ABC):
     '''
     This class is the abstract method to create imputers which can be mean, median, None
@@ -9,8 +8,8 @@ class imputerStrategy(ABC):
         featureName: name of the feature to impute in the df
 
     '''
-    def __init__(self):
-        self.logger=logger()
+    def __init__(self,logger):
+        self.logger=logger
     @abstractmethod
     def impute(self, df, featureName, replacementValue=None):
         pass
