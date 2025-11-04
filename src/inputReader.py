@@ -1,52 +1,48 @@
 from abc import ABC, abstractmethod
 import pandas as pd
-from logger import logger
+from Logger import Logger
+import logging
 class readerStrategy(ABC):
-    def __init__(self):
-        self.logger=logger()
+    def __init__(self,logger):
+        self.logger=logger
 
     @abstractmethod
     def readInput(self,path):
         pass
 
 class csvReader(readerStrategy):
-    def readInput(self,path):
-        try:
-            df=pd.read_csv(path)  
-            self.logger.info("Read csv file")
-            return df
-        except Exception as e:
-            self.logger.error("Error reading csv file")
-            return None
+    @Logger.log_exceptions(lambda self: self.logger)
+    def readInput(self,path):        
+        df=pd.read_csv(path)  
+        self.logger.info("Read csv file")
+        return df
+        
     
 class jsonReader(readerStrategy):
+    @Logger.log_exceptions(lambda self: self.logger)
     def readInput(self, path):
-        try:
-            df=pd.read_json(path)
-            self.logger.info("Read json file")
-            return df
-        except Exception as e: 
-            self.logger.error("Error reading json file")
-            return None
+        df=pd.read_json(path)
+        self.logger.info("Read json file")
+        return df
+    
 
 class csvReaderFolder(readerStrategy):
+    @Logger.log_exceptions(lambda self: self.logger)
     def readInput(self,path):
         import glob
-        try:        
-            pathcsv=path+"/*.csv"
-            paths=glob.glob(pathcsv)
-            dfs=[]
-            for path in paths:
-                dfs.append(pd.read_csv(path))
-            df=pd.concat(dfs)
-            self.logger.info("Read directory with csv files")
-            return df
-        except Exception as e:
-            self.logger.error("Error reading directory with csv files")
-            return None
+              
+        pathcsv=path+"/*.csv"
+        paths=glob.glob(pathcsv)
+        dfs=[]
+        for path in paths:
+            dfs.append(pd.read_csv(path))
+        df=pd.concat(dfs)
+        self.logger.info("Read directory with csv files")
+        return df
+       
 
 class jpgReader(readerStrategy):
-    
+    @Logger.log_exceptions(lambda self: self.logger)
     def readInput(self,path):
         from PIL import Image
         import numpy as np
@@ -57,7 +53,8 @@ class jpgReader(readerStrategy):
         return df
 
 
-class shpReader(readerStrategy):    
+class shpReader(readerStrategy):  
+    @Logger.log_exceptions(lambda self: self.logger)  
     def readInput(self, path):
         import geopandas as gpd
         gdf = gpd.read_file(path)
@@ -65,6 +62,7 @@ class shpReader(readerStrategy):
         
 
 class lasReader(readerStrategy):
+    @Logger.log_exceptions(lambda self: self.logger)
     def readInput(self, path):
         import laspy
         las = laspy.read(path)
@@ -79,13 +77,12 @@ class lasReader(readerStrategy):
 
 class factoryReader:
     @staticmethod
-    def selectInput(input):
-        logger=logger()
+    def selectInput(input,logger):
         try:
             if input=="csv":
-                return csvReader()
+                return csvReader(logger)
             elif input=="json":
-                return jsonReader()
+                return jsonReader(logger)
             else:
                 return "error"
         except Exception as e:
@@ -93,8 +90,13 @@ class factoryReader:
             return None
         
     
-        
-# factoryObj=factoryReader.selectInput("csv")
-# path="C:/RICARDO/personal/DataPipeline/data/DDoS-ACK_Fragmentation.csv"
-# df=factoryObj.readInput(path)
-# print(df) 
+
+logger=Logger("app")
+logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
+log = logger.logger
+log.setLevel(logging.DEBUG)
+
+factoryObj=factoryReader.selectInput("csv",log)
+path="C:/RICARDO/personal/DataPieline/data/DDoS-ACK_Fragmentation.csv"
+df=factoryObj.readInput(path)
+print(df) 
