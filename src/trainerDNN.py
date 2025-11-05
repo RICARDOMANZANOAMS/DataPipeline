@@ -1,7 +1,10 @@
 from trainer import trainer
 import numpy as np
+from Logger import Logger
+
 class trainerDNN(trainer):
     def __init__(self,df,featureNames,labelName):
+        self.logger=Logger.get_logger()
         super().__init__(df,featureNames,labelName)
         
 
@@ -29,7 +32,7 @@ class trainerDNN(trainer):
         dataloader_dataset=DataLoader(tensor_dataset,batch_size=batch_size,shuffle=True)
         return dataloader_dataset
     
-    def train(self, dataloader, model, num_epochs=10, lr=0.001):
+    def train_dnn(self, dataloader, model, num_epochs=10, lr=0.001):
         import torch
         import torch.nn as nn
         import torch.optim as optim
@@ -51,9 +54,9 @@ class trainerDNN(trainer):
                 optimizer.step()
 
                 total_loss += loss.item()
-        self.model=model
+        return model
 
-    def test(self,dataloader,model):
+    def test_dnn(self,dataloader,model):
         import torch
         import torch.nn as nn
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
