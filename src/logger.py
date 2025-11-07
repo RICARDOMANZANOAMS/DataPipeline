@@ -1,45 +1,67 @@
-import os
 import logging
-import sys
+from typing import Callable, Union
+
+
 class Logger:
-    def __init__(self,name_logger):
-        self.name_logger=name_logger
-        self.logger=logging.getLogger(self.name_logger)
+    _instances = {}
 
+    def __new__(cls, name: str = "app_logger"):
+        if name in cls._instances:
+            return cls._instances[name]
+        instance = super().__new__(cls)
+        cls._instances[name] = instance
+        return instance
 
-    def create_handler_with_level_and_format(self,level_logging,formatter_string,handler_type,**param_handler):
-        '''
-        This method adds handlers to the logger.
-        Handlers are the outputs that a logger can have. For example, it can log to a file or to the console.
+    def __init__(self, name_logger: str = "app_logger"):
+        # Ensure __init__ runs only once per singleton instance
+        if hasattr(self, "_initialized"):
+            return
+        self.name_logger = name_logger
+        self.logger = logging.getLogger(self.name_logger)
+        self._initialized = True
+
+    def get_logger(self) -> logging.Logger:
+        """Return the internal logger instance."""
+        return self.logger
+
+    def create_handler_with_level_and_format(self, level_logging, formatter_string, handler_type, **param_handler):
+        """
+        Adds a handler to the logger.
+
         Args:
-            level_logging (str): 'debug', 'info', or 'error'
-            formatter_string (str): The string format for the logs.
+            level_logging (str): 'debug', 'info', or 'error' (case-insensitive)
+            formatter_string (str): Format string for the log messages
             handler_type (str): 'stream' or 'file'
-            **param_handler: Extra parameters (like filename for FileHandler)
-        '''
-        handler_obj=FactoryHandler.select_handler(handler_type,**param_handler)
-        formatter=logging.Formatter(formatter_string)
-        level=FactoryLevel.select_level(level_logging)
+            **param_handler: Extra parameters for handler (like filename for FileHandler)
+        """
+        handler_obj = FactoryHandler.select_handler(handler_type, **param_handler)
+        formatter = logging.Formatter(formatter_string)
+        level = FactoryLevel.select_level(level_logging)
+
         handler_obj.setLevel(level)
         handler_obj.setFormatter(formatter)
-        self.logger.addHandler(handler_obj)
+
+        # Avoid adding duplicate handlers
+        if not any(
+            isinstance(h, type(handler_obj)) and getattr(h, "baseFilename", None) == getattr(handler_obj, "baseFilename", None)
+            for h in self.logger.handlers
+        ):
+            self.logger.addHandler(handler_obj)
+
         return self.logger
-    
+
     @staticmethod
     def log_exceptions(get_logger):
-        '''Decorator that logs exceptions using a dynamic logger from self or fixed logger.
-            This decorator was created to not put try and except wrapping each function.
-            In addition, it is dynamic since it takes a logger to log it which does flexible
-            Args: 
-                get_logger (Logger instance): Logger instance to use to log exceptions
-        '''
+        """
+        Decorator to log exceptions for a function using the provided logger.
+
+        Args:
+            get_logger (Logger instance or callable): Logger instance or callable returning a logger
+            log_traceback (bool): If True, logs the full exception traceback
+        """
         def decorator(func):
-            '''
-            Args:
-                func: Original function to be wrapped by the code
-            '''
             def wrapper(*args, **kwargs):
-                # Support callable or direct logger
+                # Get logger dynamically if callable, else use provided instance
                 logger = get_logger(args[0]) if callable(get_logger) else get_logger
                 try:
                     return func(*args, **kwargs)
@@ -49,30 +71,37 @@ class Logger:
                         #It does not log the entire traceback. The entire traceback will be log in the upper layer of the flask
                         logger.error(f"Exception in {func.__name__}")
                     raise  # bubble up to Flask or outer layers
+                    
             return wrapper
         return decorator
-    
+
+
 class FactoryHandler:
-        @staticmethod
-        def select_handler(handler_type,**param):
-            if handler_type=="stream":
-                return logging.StreamHandler()
-            if handler_type=="file":
-                 return logging.FileHandler(**param)
-            else:
-                 raise ValueError(f"Unknown handler type: {handler_type}")
+    @staticmethod
+    def select_handler(handler_type: str, **param) -> logging.Handler:
+        """Return a logging handler based on type."""
+        if handler_type.lower() == "stream":
+            return logging.StreamHandler()
+        elif handler_type.lower() == "file":
+            return logging.FileHandler(**param)
+        else:
+            raise ValueError(f"Unknown handler type: {handler_type}")
+
 
 class FactoryLevel:
-     @staticmethod
-     def select_level(level_type):
-        if level_type=="debug":
+    @staticmethod
+    def select_level(level_type: str) -> int:
+        """Return a logging level based on string input."""
+        level_type = level_type.lower()
+        if level_type == "debug":
             return logging.DEBUG
-        if level_type=="info":
+        elif level_type == "info":
             return logging.INFO
-        if level_type=="error":
+        elif level_type == "error":
             return logging.ERROR
         else:
             raise ValueError(f"Unknown level type: {level_type}")
+
 
 class Operations:
     def __init__(self,logger):
