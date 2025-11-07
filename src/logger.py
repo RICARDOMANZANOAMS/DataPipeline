@@ -5,14 +5,14 @@ from typing import Callable, Union
 class Logger:
     _instances = {}
 
-    def __new__(cls, name: str = "app_logger"):
+    def __new__(cls, name= "app_logger"):
         if name in cls._instances:
             return cls._instances[name]
         instance = super().__new__(cls)
         cls._instances[name] = instance
         return instance
 
-    def __init__(self, name_logger: str = "app_logger"):
+    def __init__(self, name_logger= "app_logger"):
         # Ensure __init__ runs only once per singleton instance
         if hasattr(self, "_initialized"):
             return
@@ -20,7 +20,7 @@ class Logger:
         self.logger = logging.getLogger(self.name_logger)
         self._initialized = True
 
-    def get_logger(self) -> logging.Logger:
+    def get_logger(self):
         """Return the internal logger instance."""
         return self.logger
 
@@ -78,7 +78,7 @@ class Logger:
 
 class FactoryHandler:
     @staticmethod
-    def select_handler(handler_type: str, **param) -> logging.Handler:
+    def select_handler(handler_type, **param):
         """Return a logging handler based on type."""
         if handler_type.lower() == "stream":
             return logging.StreamHandler()
@@ -90,7 +90,7 @@ class FactoryHandler:
 
 class FactoryLevel:
     @staticmethod
-    def select_level(level_type: str) -> int:
+    def select_level(level_type):
         """Return a logging level based on string input."""
         level_type = level_type.lower()
         if level_type == "debug":
