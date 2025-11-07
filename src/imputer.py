@@ -10,8 +10,9 @@ class ImputerStrategy(ABC):
         featureName: name of the feature to impute in the df
 
     '''
-    def __init__(self,logger):
-        self.logger=logger
+    def __init__(self):
+        self.logger=Logger().get_logger()
+
     @abstractmethod
     def impute(self, df, featureName, replacementValue=None):
         pass
@@ -82,28 +83,28 @@ class FactoryImputer:
     Factory class to implement all the classes in a modular way
     '''
     @staticmethod
-    def selectImputeMethod(imputeMethod,logger):
+    def selectImputeMethod(imputeMethod):
         
-        try:
+        # try:
             if imputeMethod=="mean":
-                return MeanImputer(logger)
+                return MeanImputer()
             elif imputeMethod=="median":
-                return MedianImputer(logger)
+                return MedianImputer()
             elif imputeMethod=="value":
-                return ValueNullImputer(logger)
+                return ValueNullImputer()
             elif imputeMethod=="valueToNull":
-                return ValueToNullImputer(logger)
+                return ValueToNullImputer()
             else:
                 raise
-        except Exception as e:
-            logger.error("Error selecting impute method ", exc_info=True)
-            return None
+        # except Exception as e:
+        #     logger.error("Error selecting impute method ", exc_info=True)
+        #     return None
         
 import pandas as pd
 import numpy as np
 
 
-logger=Logger("app")
+logger=Logger()
 logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
 log = logger.logger
 log.setLevel(logging.DEBUG)
@@ -112,7 +113,7 @@ path='./data/DDoS-ACK_Fragmentation.csv'
 df=pd.read_csv(path)
 featureName="Rate"
 replacementValue=np.inf
-imputer=FactoryImputer.selectImputeMethod("valueToNull",log)
+imputer=FactoryImputer.selectImputeMethod("valueToNull")
 df = imputer.impute(df, featureName, replacementValue=np.inf)
 print(df)
 # replacementValue=np.inf
