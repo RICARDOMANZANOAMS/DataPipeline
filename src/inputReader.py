@@ -3,8 +3,8 @@ import pandas as pd
 from Logger import Logger
 import logging
 class readerStrategy(ABC):
-    def __init__(self,logger):
-        self.logger=logger
+    def __init__(self):
+        self.logger=Logger().get_logger()
 
     @abstractmethod
     def readInput(self,path):
@@ -77,12 +77,12 @@ class lasReader(readerStrategy):
 
 class factoryReader:
     @staticmethod
-    def selectInput(input,logger):
+    def selectInput(input):
         try:
             if input=="csv":
-                return csvReader(logger)
+                return csvReader()
             elif input=="json":
-                return jsonReader(logger)
+                return jsonReader()
             else:
                 return "error"
         except Exception as e:
@@ -91,12 +91,13 @@ class factoryReader:
         
     
 
-logger=Logger("app")
+
+logger=Logger()
 logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
 log = logger.logger
 log.setLevel(logging.DEBUG)
 
-factoryObj=factoryReader.selectInput("csv",log)
-path="C:/RICARDO/personal/DataPieline/data/DDoS-ACK_Fragmentation.csv"
+factoryObj=factoryReader.selectInput("csv")
+path="C:/RICARDO/personal/DataPipeline/data/DDoS-ACK_Fragmentation.csv"
 df=factoryObj.readInput(path)
 print(df) 
