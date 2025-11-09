@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
 from sklearn.metrics import confusion_matrix
 import numpy as np
+from Logger import Logger
 class Metrics:
     def __init__(self,predicted_values,ground_truth,dict_encode_labels):
         self.predicted_values=predicted_values
         self.ground_truth=ground_truth
         self.dict_encode_labels=dict_encode_labels
         self.label_encoded=list(self.dict_encode_labels.values())
+        self.logger=Logger().get_logger()
 
+    @Logger.log_exceptions(lambda self: self.logger) 
     def calculate_metrics_classification(self):
         '''
         This method calculates the main important metrics for classification
@@ -27,7 +30,8 @@ class Metrics:
 
             main_metrics[label]={"tp":tp,"fp":fp,"fn":fn,"tn":tn,"precision":precision,"recall":recall,"f1-score":f1}
         return main_metrics
-
+    
+    @Logger.log_exceptions(lambda self: self.logger) 
     def calculate_metrics_regression(self):
         """
         Calculates the main metrics for regression
