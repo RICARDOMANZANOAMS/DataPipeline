@@ -63,3 +63,17 @@ class Metrics:
             "R2": r2,
             "MAPE": mape
         }
+    
+import logging
+logger=Logger()
+logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
+log = logger.logger
+log.setLevel(logging.DEBUG)
+import pandas as pd
+labels_truth=np.random.choice([0,1],size=100)
+labels_pred=np.random.choice([0,1],size=100)
+labels_truth_pd=pd.DataFrame(labels_truth)
+labels_pred_pd=pd.DataFrame(labels_pred)
+metrics=Metrics(labels_pred_pd,labels_truth_pd,{"0":0,"1":1})
+main_metrics=metrics.calculate_metrics_classification()
+print(main_metrics)
