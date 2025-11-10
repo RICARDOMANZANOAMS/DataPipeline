@@ -1,9 +1,12 @@
 from abc import ABC,abstractmethod
 from sklearn.model_selection import train_test_split,KFold, LeaveOneOut
+from Logger import Logger
 class splitStrategy(ABC):
     '''
     Class strategy for split datasets
     '''
+    def __init__(self):
+        self.logger=Logger().get_logger()
     @abstractmethod
     def splitDataset(self,df):
         pass
@@ -12,8 +15,9 @@ class dataSplitStrategy(splitStrategy):
     '''
     Child class that implements split strategy only in two subdatasets
     '''
-    def splitDataset(self,df,testSize=0.2):
-        train,test=train_test_split(df,test_size=testSize) 
+    @Logger.log_exceptions(lambda self: self.logger)
+    def splitDataset(self,df,test_size=0.2):
+        train,test=train_test_split(df,test_size=test_size) 
         return [(train, test)]
     
 class kFoldStrategy(splitStrategy):
@@ -21,6 +25,7 @@ class kFoldStrategy(splitStrategy):
     Child class that implements k fold. 
     To illustrate, if k=4, it will divide the dataset in 4, it will train with 3 parts and test with one
     '''
+    @Logger.log_exceptions(lambda self: self.logger)
     def splitDataset(self,df,kFolds):
         kf = KFold(n_splits=kFolds)
         return [(df.iloc[train_idx], df.iloc[test_idx]) for train_idx, test_idx in kf.split(df)]
@@ -31,6 +36,7 @@ class leaveOneOutStrategy(splitStrategy):
     This method leaves only one sample to test while it trains with all the rest.
     
     '''
+    @Logger.log_exceptions(lambda self: self.logger)
     def splitDataset(self, df):
         loo = LeaveOneOut()
         return [(df.iloc[train_idx], df.iloc[test_idx]) for train_idx, test_idx in loo.split(df)]
@@ -46,13 +52,21 @@ class factorySplit:
             return leaveOneOutStrategy()
         else:
             return "Split Method not implemented "
-# import pandas as pd
-# import numpy as np
-# path='./data/DDoS-ACK_Fragmentation.csv'
-# df=pd.read_csv(path)
-# splitMethod=factorySplit.selectSplit("split")
-# dataset=splitMethod.splitDataset(df,0.2)
-# print(dataset)
+
+
+import logging
+logger=Logger()
+logger.create_handler_with_level_and_format("info", "%(asctime)s - %(levelname)s - %(message)s","file",filename="app.log")
+log = logger.logger
+log.setLevel(logging.DEBUG)
+
+import pandas as pd
+import numpy as np
+path='./data/DDoS-ACK_Fragmentation.csv'
+df=pd.read_csv(path)
+splitMethod=factorySplit.selectSplit("split")
+dataset=splitMethod.splitDataset(df,0.2)
+print(dataset)
 # splitMethod=factorySplit.selectSplit("LOOCV")
 # dataset=splitMethod.splitDataset(df)
 # print(dataset)
