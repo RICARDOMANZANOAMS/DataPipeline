@@ -1,5 +1,6 @@
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 import numpy as np
+from Logger import Logger
 class trainer:
     '''
     This class is the general class to train a classification or regression problem
@@ -10,7 +11,9 @@ class trainer:
         self.labelName=labelName
         self.splitArray=[]
         self.model=None
-
+        self.logger=Logger().get_logger()
+    
+    @Logger.log_exceptions(lambda self: self.logger)  
     def splitDataset(self,splitMethod,params):
         '''
         This method implements the class split which is used to split a dataset in different strategies
@@ -23,6 +26,7 @@ class trainer:
         objFactorySplit=factorySplit.selectSplit(splitMethod)  #Select the split method
         self.splitArray=objFactorySplit.splitDataset(self.df,**params) #Split the dataset
     
+    @Logger.log_exceptions(lambda self: self.logger) 
     def trainTest(self):
         '''
         This method implements the training and testinting of the model in the split dataset 
@@ -31,12 +35,14 @@ class trainer:
             modelTrain=self.train(train)
             modelTest=self.test(test)
 
+    @Logger.log_exceptions(lambda self: self.logger) 
     def train(self,trainDataset):
         '''
         This method implements the training of the model
         '''
         self.model.fit(trainDataset[self.featureNames],trainDataset[self.labelName])
-        
+
+    @Logger.log_exceptions(lambda self: self.logger)     
     def test(self,testDataset):
         '''
         This method implements the testing of the model and calculates confusion matrix, classification report,
