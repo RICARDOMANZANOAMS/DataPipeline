@@ -1,13 +1,16 @@
-from trainer import trainer
+
 import numpy as np
 from Logger import Logger
 
-class trainerDNN(trainer):
+class trainerDNN:
     def __init__(self,df,featureNames,labelName):
-        self.logger=Logger.get_logger()
-        super().__init__(df,featureNames,labelName)
+        self.logger=Logger().get_logger()
+        self.df=df
+        self.featureNames=featureNames
+        self.labelName=labelName
         
-
+        
+    @Logger.log_exceptions(lambda self: self.logger)
     def split(self,splitMethod,params):
         from split import factorySplit       
         import torch
@@ -22,7 +25,7 @@ class trainerDNN(trainer):
             test_tensor=self.create_dataloader(test)
             split_tensors.append((train_tensor,test_tensor))
         return split_tensors
-            
+    @Logger.log_exceptions(lambda self: self.logger)       
     def create_dataloader(self,df,batch_size=32,shuffle=True):
         import torch
         from torch.utils.data import TensorDataset, DataLoader
@@ -31,7 +34,7 @@ class trainerDNN(trainer):
         tensor_dataset=TensorDataset(features,label)
         dataloader_dataset=DataLoader(tensor_dataset,batch_size=batch_size,shuffle=True)
         return dataloader_dataset
-    
+    @Logger.log_exceptions(lambda self: self.logger)
     def train_dnn(self, dataloader, model, num_epochs=10, lr=0.001):
         import torch
         import torch.nn as nn
@@ -41,7 +44,7 @@ class trainerDNN(trainer):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=lr)
 
-        model.train()
+        
         for epoch in range(num_epochs):
             total_loss = 0
             for features, label in dataloader:
@@ -55,7 +58,7 @@ class trainerDNN(trainer):
 
                 total_loss += loss.item()
         return model
-
+    @Logger.log_exceptions(lambda self: self.logger)
     def test_dnn(self,dataloader,model):
         import torch
         import torch.nn as nn
@@ -80,40 +83,39 @@ class trainerDNN(trainer):
            
 
     
-# import numpy as np
-# import pandas as pd
+import numpy as np
+import pandas as pd
 
-# x=np.random.rand(30,4)
-# y=np.random.choice([1,0],size=30)    
-# feature_names=['f1','f2','f3','f4']
-# X=pd.DataFrame(x,columns=feature_names)
-# y=pd.DataFrame(y,columns=['label'])
-# print(X)
-# print(y)
-# dataset=pd.concat([X,y],axis=1)
-# print(dataset)
-# trainer_dnn=trainerDNN(dataset,feature_names,'label')
-# dataloader=trainer_dnn.create_dataloader(dataset)
-# print(dataloader)
-# train_test=trainer_dnn.split("split",{"test_size":0.2})
-# print(train_test)
+x=np.random.rand(30,4)
+y=np.random.choice([1,0],size=30)    
+feature_names=['f1','f2','f3','f4']
+X=pd.DataFrame(x,columns=feature_names)
+y=pd.DataFrame(y,columns=['label'])
+print(X)
+print(y)
+dataset=pd.concat([X,y],axis=1)
+print(dataset)
+trainer_dnn=trainerDNN(dataset,feature_names,'label')
+
+train_test=trainer_dnn.split("split",{"test_size":0.2})
+print(train_test)
 
 
-# import torch.nn as nn
-# import torch
-# class NeuralNetwork(nn.Module):
-#     def __init__(self, input_dim, hidden_dim, output_dim):
-#         super(NeuralNetwork, self).__init__()
-#         self.hidden = nn.Linear(input_dim, hidden_dim)
-#         self.output = nn.Linear(hidden_dim, output_dim)
+import torch.nn as nn
+import torch
+class NeuralNetwork(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(NeuralNetwork, self).__init__()
+        self.hidden = nn.Linear(input_dim, hidden_dim)
+        self.output = nn.Linear(hidden_dim, output_dim)
     
-#     def forward(self, x):
-#         x = torch.relu(self.hidden(x))  # Apply ReLU activation correctly
-#         x = self.output(x)
-#         return x
-# network=NeuralNetwork(4,8,2)
+    def forward(self, x):
+        x = torch.relu(self.hidden(x))  # Apply ReLU activation correctly
+        x = self.output(x)
+        return x
+network=NeuralNetwork(4,8,2)
 
-# trainer_dnn.train(train_test[0][0],network)
-# preds, labels = trainer_dnn.test(train_test[0][1], network)
-# print("Predicted:", preds)
-# print("True:", labels)
+model_trained=trainer_dnn.train_dnn(train_test[0][0],network)
+preds, labels = trainer_dnn.test_dnn(train_test[0][1], model_trained)
+print("Predicted:", preds)
+print("True:", labels)
