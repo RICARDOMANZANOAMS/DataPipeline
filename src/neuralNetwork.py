@@ -1,13 +1,16 @@
 import torch.nn as nn
 import torch
+from Logger import Logger
 class BaseModel(nn.Module):
     def __init__(self):
+        self.logger=Logger().get_logger()
         super(BaseModel, self).__init__()
 
     def forward(self, x):
         raise NotImplementedError("Subclasses must implement forward method")
     
 class FeedForwardNN(BaseModel):
+    
     def __init__(self, input_size, layers_array, output_size):
         super(FeedForwardNN, self).__init__()
         layer_sizes = [input_size] + layers_array + [output_size]
@@ -15,7 +18,7 @@ class FeedForwardNN(BaseModel):
             nn.Linear(layer_sizes[i], layer_sizes[i + 1])
             for i in range(len(layer_sizes) - 1)
         ])
-
+    @Logger.log_exceptions(lambda self: self.logger) 
     def forward(self, x):
         for i, layer in enumerate(self.layers):
             x = layer(x)
@@ -24,6 +27,7 @@ class FeedForwardNN(BaseModel):
         return x
     
 class CNN(BaseModel):
+   
     def __init__(self,input_channels,number_layers,output):
         self.convs = nn.ModuleList()
         for i in range(number_layers):           
@@ -37,7 +41,7 @@ class CNN(BaseModel):
             self.convs.append(conv_layer)
         self.flatten=nn.Flatten()
         self.fc = nn.Linear(10 * 3 * 3, output) 
-
+    @Logger.log_exceptions(lambda self: self.logger) 
     def forward(self,x):
         for conv in self.convs:
             x = conv(x)
@@ -45,4 +49,5 @@ class CNN(BaseModel):
         x = self.fc(x)
         return x
 
-        
+network=FeedForwardNN(3,[100,100,200],5)
+print(network)
