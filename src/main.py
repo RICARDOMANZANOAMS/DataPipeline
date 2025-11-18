@@ -37,28 +37,28 @@ def main():
             log.info("Successful read input")
    
 
-    # # Preprocessing section in config file
-    # preprocessing = config.get("preprocessing")
-    # for stepPreproc in preprocessing:
-    #     if "duplicates" in stepPreproc:
-    #         duplicatesConfig=stepPreproc["duplicates"]
-    #         if duplicatesConfig.get("enabled") and duplicatesConfig.get("dropDuplicates"):                               
-    #             print("Drop duplicates parameters load")
-    #             from preprocessing import preprocessing
-    #             preprocessingObj=preprocessing(df)
-    #             df=preprocessingObj.dropDuplicates()
-            
+    # Preprocessing section in config file
+    preprocessing = config.get("preprocessing")
+    for stepPreproc in preprocessing:
+        if "duplicates" in stepPreproc:
+            duplicatesConfig=stepPreproc["duplicates"]
+            if duplicatesConfig.get("enabled") and duplicatesConfig.get("dropDuplicates"):                               
+                print("Drop duplicates parameters load")
+                from preprocessing import preprocessing
+                preprocessingObj=preprocessing(df)
+                df=preprocessingObj.dropDuplicates()
+                print(df)
 
-    #     if "imputation" in stepPreproc:
-    #         inputationConfig=stepPreproc["imputation"]
-    #         if inputationConfig.get("enabled"):  
-    #             featureToInput= inputationConfig["featureName"]
-    #             lookUpValue=inputationConfig["lookUpValue"]   
-    #             method=inputationConfig["method"]   
-    #             print("Imputation parameters load")
-    #             from preprocessing import preprocessing
-    #             preprocessingObj=preprocessing(df)
-    #             df=preprocessingObj.imputeValue(method,featureToInput,lookUpValue)
+        if "imputation" in stepPreproc:
+            inputationConfig=stepPreproc["imputation"]
+            if inputationConfig.get("enabled"):  
+                featureToInput= inputationConfig["featureName"]
+                lookUpValue=inputationConfig["lookUpValue"]   
+                method=inputationConfig["method"]   
+                print("Imputation parameters load")
+                from preprocessing import preprocessing
+                preprocessingObj=preprocessing(df)
+                df=preprocessingObj.imputeValue(method,featureToInput,lookUpValue)
 
 
                
