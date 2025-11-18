@@ -11,29 +11,30 @@ def main():
     log.info("test")
     log.error("this an error")
     
-# ------------------------------
+    # ------------------------------
     # READ CONFIGURATION FILE PARAMETERS AND CALL CLASSES AND METHODS
     #-------------------------------
     # parser = argparse.ArgumentParser()
     # parser.add_argument("--config", type=str, required=True)
     # args = parser.parse_args()
     # configPath=args.config
-    # configPath="./config/config.json"
-    # # Load configuration file in json
-    # with open( configPath, "r") as f:
-    #     config = json.load(f)
+    configPath="./config/config.json"
+    # Load configuration file in json
+    with open( configPath, "r") as f:
+        config = json.load(f)
 
-    # # Reader section in config file
+    # Reader section in config file
 
     # reader = config.get("reader")
     # if reader.get("enabled"):
     #     pathInput = reader.get("pathInput") #Get path from config file
     #     inputType = reader.get("type")      #Get type input from config file
-    #     logger.info()
+       
     #     from inputReader import factoryReader   
     #     readerObj=factoryReader.selectInput(inputType) #Select factory from reader type
     #     df=readerObj.readInput(pathInput)       #Read input
-
+    #     if not df.empty:
+    #         log.info("Successful read input")
    
 
     # # Preprocessing section in config file
