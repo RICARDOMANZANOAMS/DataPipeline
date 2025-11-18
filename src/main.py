@@ -25,16 +25,16 @@ def main():
 
     # Reader section in config file
 
-    # reader = config.get("reader")
-    # if reader.get("enabled"):
-    #     pathInput = reader.get("pathInput") #Get path from config file
-    #     inputType = reader.get("type")      #Get type input from config file
+    reader = config.get("reader")
+    if reader.get("enabled"):
+        pathInput = reader.get("pathInput") #Get path from config file
+        inputType = reader.get("type")      #Get type input from config file
        
-    #     from inputReader import factoryReader   
-    #     readerObj=factoryReader.selectInput(inputType) #Select factory from reader type
-    #     df=readerObj.readInput(pathInput)       #Read input
-    #     if not df.empty:
-    #         log.info("Successful read input")
+        from inputReader import factoryReader   
+        readerObj=factoryReader.selectInput(inputType) #Select factory from reader type
+        df=readerObj.readInput(pathInput)       #Read input
+        if not df.empty:
+            log.info("Successful read input")
    
 
     # # Preprocessing section in config file
