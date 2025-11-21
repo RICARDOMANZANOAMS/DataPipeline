@@ -62,24 +62,30 @@ def main():
 
 
                
-    # #Training section in config file
-    # training = config.get("training")
-    # dataSplit = training.get("dataSplit", {})
-    # if dataSplit.get("enabled"):    
-    #     from classificationTrainer import classificationTrainer   
-    #     objclassificationTrainer=classificationTrainer()
-    #     methodCrossValidation= dataSplit["crossValidation"]
-    #     if methodCrossValidation=="kfold":
-    #         numberFolds= dataSplit["numberFoldsTraining"]
-    #         print("Split parameters uploaded")
+    #Training section in config file
+    training = config.get("training")
+    dataSplit = training.get("dataSplit", {})
+    featureNames = dataSplit.get("featureNames")
+    labelName= dataSplit.get("labelName")
+    
+    if dataSplit.get("enabled"):    
+        from classificationTrainer import classificationTrainer   
+        objclassificationTrainer=classificationTrainer(df, featureNames, labelName)
+        methodCrossValidation= dataSplit["crossValidation"]
+       
 
-    #     if methodCrossValidation=="split":
-    #         trainSet=dataSplit["trainSetPercentage"]
-    #         testSet=dataSplit["testSetPercentage"]
-    #         validationSet=dataSplit["validationSetPercentage"]
-    #         print("Split parameters uploaded")
-    #     if methodCrossValidation=="LOOCV":
-    #         print("Split parameters uploaded")
+        if methodCrossValidation=="split":
+            trainSetPercentage=dataSplit["trainSetPercentage"]
+            testSetPercentage=dataSplit["testSetPercentage"]
+            validationSetPercentage=dataSplit["validationSetPercentage"]
+            objclassificationTrainer.splitDataset("split",{'test_size':testSetPercentage})
+            print("Split parameters uploaded")
+
+        # if methodCrossValidation=="kfold":
+        #     numberFolds= dataSplit["numberFoldsTraining"]
+        #     print("Split parameters uploaded")
+        # if methodCrossValidation=="LOOCV":
+        #     print("Split parameters uploaded")
 
        
         
